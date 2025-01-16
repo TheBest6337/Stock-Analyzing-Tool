@@ -23,6 +23,14 @@ This project is currently under development. Future features may include:
 - More detailed fundamental analysis which compares different stocks
 - Enhanced visualization options
 
+### Roadmap
+
+- [] Better score evaluation
+- [] Compare with other stocks
+- [] News information
+- [] Multi-lanuage support
+- [] Dark mode
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
