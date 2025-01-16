@@ -23,6 +23,21 @@ This project is currently under development. Future features may include:
 - More detailed fundamental analysis which compares different stocks
 - Enhanced visualization options
 
+## Prerequisites
+
+Before you begin, ensure you have the following installed on your system:
+- Node.js (version 16.0 or higher)
+- npm (Node Package Manager, usually comes with Node.js)
+
+You can check if you have these installed by running:
+```sh
+node --version
+npm --version
+```
+
+If you need to install these tools:
+- Node.js & npm: Download from [nodejs.org](https://nodejs.org/)
+
 ## Setup
 
 1. Clone the repository
