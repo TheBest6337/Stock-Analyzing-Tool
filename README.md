@@ -41,15 +41,19 @@ If you need to install these tools:
 ## Setup
 
 1. Clone the repository
-2. Install dependencies:
+2. Change into the application directory:
+```sh
+cd app
+```
+3. Install dependencies:
 ```sh
 npm install
 ```
-3. Create a ```.env``` file with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
+4. Create a ```.env``` file with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
 ```
-4. Run the development server:
+5. Run the development server:
 ```sh
 npm run dev
 ```
