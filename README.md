@@ -1,5 +1,3 @@
-Collecting workspace information
-
 # Stock Analyzer
 
 A React-based stock analysis tool that provides technical indicators and investment recommendations based on fundamental analysis.
