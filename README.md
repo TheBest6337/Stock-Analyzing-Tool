@@ -6,7 +6,7 @@ A React-based stock analysis tool that provides technical indicators and investm
 
 ## Features
 
-- Real-time stock data fetching using Financial Modeling Prep API
+- Stock data fetching using Financial Modeling Prep API
 - Company search functionality
 - Interactive price charts with multiple timeframes (1W, 1M, 3M, 1Y)
 - Fundamental analysis including:
