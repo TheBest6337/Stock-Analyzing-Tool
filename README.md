@@ -58,14 +58,6 @@ npm run dev
 
 This tool is for educational and informational purposes only. The investment recommendations and analysis provided should not be considered as financial advice. Always conduct your own research and consult with a qualified financial advisor before making any investment decisions. The creator of this tool cannot be held liable for any financial losses incurred based on investment decisions made using this application.
 
-## Technologies Used
-
-- React
-- TypeScript
-- Vite
-- Chart.js
-- Tailwind CSS
-
 ## License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE.txt) file for details.
