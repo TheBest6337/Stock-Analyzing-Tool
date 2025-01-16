@@ -2,6 +2,8 @@
 
 A React-based stock analysis tool that provides technical indicators and investment recommendations based on fundamental analysis.
 
+![image](https://github.com/user-attachments/assets/3ed97abf-cf7d-4685-b3e0-db68f559ae26)
+
 ## Features
 
 - Real-time stock data fetching using Financial Modeling Prep API
@@ -11,9 +13,6 @@ A React-based stock analysis tool that provides technical indicators and investm
   - P/E Ratio
   - P/S Ratio
   - Trading Volume
-  - Current Ratio
-  - Debt to Equity
-  - Market Cap
 - Automated investment recommendations based on multiple metrics
 - Responsive design with Tailwind CSS
 
