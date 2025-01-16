@@ -31,7 +31,7 @@ This project is currently under development. Future features may include:
 ```sh
 npm install
 ```
-3. Create a ```.env ``` file with your API key:
+3. Create a ```.env``` file with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
 ```
