@@ -21,9 +21,7 @@ A React-based stock analysis tool that provides technical indicators and investm
 
 This project is currently under development. Future features may include:
 - Additional technical indicators
-- Portfolio tracking
-- Price alerts
-- More detailed fundamental analysis
+- More detailed fundamental analysis which compares different stocks
 - Enhanced visualization options
 
 ## Setup
@@ -33,11 +31,7 @@ This project is currently under development. Future features may include:
 ```sh
 npm install
 ```
-3. Create a 
-
-.env
-
- file with your API keys:
+3. Create a ```.env ``` file with your API key:
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
 ```
@@ -57,7 +51,6 @@ This tool is for educational and informational purposes only. The investment rec
 - Vite
 - Chart.js
 - Tailwind CSS
-- Financial Modeling Prep API
 
 ## License
 
