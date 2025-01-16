@@ -25,11 +25,11 @@ This project is currently under development. Future features may include:
 
 ### Roadmap
 
-- [] Better score evaluation
-- [] Compare with other stocks
-- [] News information
-- [] Multi-lanuage support
-- [] Dark mode
+- [ ] Better score evaluation
+- [ ] Compare with other stocks
+- [ ] News information
+- [ ] Multi-lanuage support
+- [ ] Dark mode
 
 ## Prerequisites
 
