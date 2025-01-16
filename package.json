@@ -1,4 +1,15 @@
 {
+  "author": "TheBest6337",
+  "keywords": [
+    "react",
+    "typescript",
+    "stock-analysis",
+    "financial-data"
+  ],
+  "bugs": {
+    "url": "https://github.com/TheBest6337/Stock-Analyzing-Tool/issues"
+  },
+  "homepage": "https://github.com/TheBest6337/Stock-Analyzing-Tool#readme",
   "name": "stock-analyzer",
   "description": "A React-based stock analysis tool with technical indicators and recommendations",
   "private": true,
