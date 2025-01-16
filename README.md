@@ -49,7 +49,7 @@ cd app
 ```sh
 npm install
 ```
-4. Create a ```.env``` file with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
+4. Create a ```.env``` file in the ```app``` directory with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
 ```
