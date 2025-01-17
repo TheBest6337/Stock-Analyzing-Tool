@@ -1,4 +1,4 @@
-# Stock Analyzer
+# Stock Analyzer (WIP)
 
 A React-based stock analysis tool that provides technical indicators and investment recommendations based on fundamental analysis.
 
