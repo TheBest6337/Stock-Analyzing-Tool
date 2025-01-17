@@ -37,7 +37,7 @@ export default function StockMetrics({ stock }: Props) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
       <h2 className="text-2xl font-semibold mb-6">Key Metrics Analysis</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -73,13 +73,13 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, icon, evaluation }: MetricCardProps) {
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
+    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
       <div className="flex items-center mb-2">
-        <span className="text-gray-600">{icon}</span>
-        <h3 className="ml-2 font-medium text-gray-800">{title}</h3>
+        <span className="text-gray-600 dark:text-gray-300">{icon}</span>
+        <h3 className="ml-2 font-medium text-gray-800 dark:text-gray-100">{title}</h3>
       </div>
       <div className="mt-2">
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
         <p className={`mt-1 ${evaluation.color}`}>{evaluation.status}</p>
       </div>
     </div>
