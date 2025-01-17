@@ -59,7 +59,7 @@ export default function StockSearch({ onStockSelect }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by company name or symbol..."
-          className="flex-1 p-2 border rounded bg-gray-800 text-white"
+          className="flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-black dark:text-white"
         />
         <button
           onClick={handleSearch}
