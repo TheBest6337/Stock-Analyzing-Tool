@@ -4,6 +4,7 @@ import StockMetrics from './components/StockMetrics';
 import StockRecommendation from './components/StockRecommendation';
 import StockGraph from './components/StockGraph';
 import { StockData } from './types';
+import { Sun, Moon } from 'lucide-react';
 
 function App() {
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null);
@@ -14,16 +15,16 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
+    <div className={`min-h-screen ${isDarkMode ? 'dark' : 'light'}`}>
       <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-2">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</h1>
+        <header className="text-center mb-12 relative">
+          <h1 className="text-4xl font-bold mb-2">Stock Analyzer</h1>
           <p>Comprehensive stock evaluation and recommendations</p>
           <button
             onClick={toggleDarkMode}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="absolute top-4 right-4 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
           >
-            Toggle {isDarkMode ? 'Light' : 'Dark'} Mode
+            {isDarkMode ? <Sun /> : <Moon />}
           </button>
         </header>
 
