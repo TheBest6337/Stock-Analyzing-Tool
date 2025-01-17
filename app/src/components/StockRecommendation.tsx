@@ -41,10 +41,10 @@ export default function StockRecommendation({ stock }: Props) {
   const score = calculateScore();
   
   const getRecommendationClass = () => {
-    if (score >= 80) return 'bg-green-100 text-green-800';
-    if (score >= 60) return 'bg-blue-100 text-blue-800';
-    if (score >= 40) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
+    if (score >= 80) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+    if (score >= 60) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    if (score >= 40) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
   };
 
   const getRecommendationText = () => {
@@ -57,7 +57,7 @@ export default function StockRecommendation({ stock }: Props) {
   const getPEWarning = () => {
     if (stock.metrics.pe < 0) {
       return (
-        <div className="mt-4 p-3 bg-orange-100 text-orange-800 rounded-lg">
+        <div className="mt-4 p-3 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 rounded-lg">
           <p className="font-medium">⚠️ Warning: Negative P/E Ratio</p>
           <p className="text-sm mt-1">
             A negative P/E ratio indicates the company is currently operating at a loss. 
@@ -70,15 +70,15 @@ export default function StockRecommendation({ stock }: Props) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
       <h2 className="text-2xl font-semibold mb-6">Investment Recommendation</h2>
       
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <AlertCircle className="text-blue-600 mr-2" />
+          <AlertCircle className="text-blue-600 dark:text-blue-400 mr-2" />
           <span className="text-lg font-medium">Overall Score</span>
         </div>
-        <div className="text-3xl font-bold text-blue-600">{score}/100</div>
+        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{score}/100</div>
       </div>
 
       <div className={`rounded-lg p-4 ${getRecommendationClass()}`}>

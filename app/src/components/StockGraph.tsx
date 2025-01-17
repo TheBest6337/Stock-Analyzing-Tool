@@ -35,7 +35,7 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
   
   if (!stock.historicalData?.length) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg text-center text-gray-600">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center text-gray-600 dark:text-gray-300">
         No historical data available
       </div>
     );
@@ -168,10 +168,10 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg h-full">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg h-full">
       <div className="flex items-center justify-between mb-4">
         <div className="text-lg font-semibold space-y-1">
-          <div className="text-gray-900">
+          <div className="text-gray-900 dark:text-gray-100">
             ${displayValues.price.toFixed(2)}
           </div>
           <div className={`${
@@ -189,7 +189,7 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
               className={`px-3 py-1 rounded ${
                 timeRange === range 
                   ? 'bg-blue-500 text-white' 
-                  : 'bg-gray-100 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               {range}
