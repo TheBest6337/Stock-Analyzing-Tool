@@ -61,8 +61,7 @@ npm install
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
 ```
-5. Obtain your API key from News API.
-6. Add the following line to the `.env` file:
+5. if you want to see the latest news, obtain your API key from [News API](https://newsapi.org/) and add the following line to the `.env` file:
 ```sh
 VITE_NEWS_API_KEY=your_news_api_key_here
 ```
