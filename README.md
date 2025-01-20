@@ -27,7 +27,7 @@ This project is currently under development. Future features may include:
 
 - [ ] Better score evaluation
 - [ ] Compare with other stocks
-- [ ] News information
+- [x] News information
 - [ ] Multi-lanuage support
 - [x] Dark mode
 
