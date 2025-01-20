@@ -3,6 +3,7 @@ import StockSearch from './components/StockSearch';
 import StockMetrics from './components/StockMetrics';
 import StockRecommendation from './components/StockRecommendation';
 import StockGraph from './components/StockGraph';
+import StockNews from './components/StockNews';
 import { StockData } from './types';
 import { Sun, Moon } from 'lucide-react';
 
@@ -42,6 +43,10 @@ function App() {
             
             <div className="max-w-5xl mx-auto">
               <StockGraph stock={selectedStock} />
+            </div>
+
+            <div className="max-w-5xl mx-auto">
+              <StockNews symbol={selectedStock.symbol} />
             </div>
           </div>
         )}
