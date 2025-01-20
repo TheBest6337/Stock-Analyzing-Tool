@@ -109,6 +109,11 @@ export async function getStockNews(symbol: string): Promise<NewsArticle[]> {
       `${BASE_URL}/stock_news?tickers=${symbol}&limit=10&apikey=${API_KEY}`
     );
 
+    if (response.status === 403) {
+      console.error('Error fetching stock news: Access forbidden (403)');
+      throw new Error('Failed to fetch stock news: Access forbidden');
+    }
+
     if (!response.ok) {
       throw new Error('Failed to fetch stock news');
     }
