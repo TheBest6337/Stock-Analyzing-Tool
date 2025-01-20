@@ -102,3 +102,31 @@ export async function getHistoricalData(symbol: string): Promise<{ date: string;
     throw error;
   }
 }
+
+export async function getStockNews(symbol: string): Promise<NewsArticle[]> {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/stock_news?tickers=${symbol}&limit=10&apikey=${API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch stock news');
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid news data format');
+    }
+
+    return data.map((item: any) => ({
+      title: item.title,
+      description: item.text,
+      url: item.url,
+      publishedAt: item.publishedDate
+    }));
+  } catch (error) {
+    console.error('Error fetching stock news:', error);
+    throw error;
+  }
+}
