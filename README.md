@@ -61,7 +61,13 @@ npm install
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
 ```
-5. Run the development server:
+5. Obtain your API key from News API.
+6. Add the following line to the `.env` file:
+```sh
+VITE_NEWS_API_KEY=your_news_api_key_here
+```
+7. Ensure that the `.gitignore` file includes `.env` to prevent the API key from being committed to the repository.
+8. Run the development server:
 ```sh
 npm run dev
 ```
