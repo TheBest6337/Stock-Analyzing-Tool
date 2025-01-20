@@ -1,7 +1,7 @@
 const API_KEY = import.meta.env.VITE_FMP_API_KEY;
 const BASE_URL = 'https://financialmodelingprep.com/api/v3';
-import axios from 'axios';
-import * as cheerio from 'cheerio';
+const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+const NEWS_API_URL = 'https://newsapi.org/v2/everything';
 
 export async function getStockData(symbol: string) {
   try {
@@ -107,29 +107,31 @@ export async function getHistoricalData(symbol: string): Promise<{ date: string;
 
 export async function getStockNews(symbol: string): Promise<NewsArticle[]> {
   try {
-    const url = `https://www.marketwatch.com/investing/stock/${symbol}/news`;
-    const { data } = await axios.get(url);
-    const $ = cheerio.load(data);
+    const response = await fetch(
+      `${NEWS_API_URL}?q=${symbol}&apiKey=${NEWS_API_KEY}`
+    );
 
-    const articles: NewsArticle[] = [];
+    if (response.status === 403) {
+      console.error('Error fetching stock news: Access forbidden (403)');
+      throw new Error('Failed to fetch stock news: Access forbidden');
+    }
 
-    $('.article__content').each((index, element) => {
-      const title = $(element).find('.article__headline').text().trim();
-      const description = $(element).find('.article__summary').text().trim();
-      const url = $(element).find('a').attr('href');
-      const publishedAt = $(element).find('.article__timestamp').attr('datetime');
+    if (!response.ok) {
+      throw new Error('Failed to fetch stock news');
+    }
 
-      if (title && description && url && publishedAt) {
-        articles.push({
-          title,
-          description,
-          url,
-          publishedAt
-        });
-      }
-    });
+    const data = await response.json();
 
-    return articles;
+    if (!Array.isArray(data.articles)) {
+      throw new Error('Invalid news data format');
+    }
+
+    return data.articles.map((item: any) => ({
+      title: item.title,
+      description: item.description,
+      url: item.url,
+      publishedAt: item.publishedAt
+    }));
   } catch (error) {
     console.error('Error fetching stock news:', error);
     throw error;
