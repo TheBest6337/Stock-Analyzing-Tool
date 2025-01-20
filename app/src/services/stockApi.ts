@@ -1,7 +1,7 @@
 const API_KEY = import.meta.env.VITE_FMP_API_KEY;
 const BASE_URL = 'https://financialmodelingprep.com/api/v3';
 import axios from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 export async function getStockData(symbol: string) {
   try {
