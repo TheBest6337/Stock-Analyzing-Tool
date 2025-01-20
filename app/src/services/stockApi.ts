@@ -1,5 +1,7 @@
 const API_KEY = import.meta.env.VITE_FMP_API_KEY;
 const BASE_URL = 'https://financialmodelingprep.com/api/v3';
+import axios from 'axios';
+import cheerio from 'cheerio';
 
 export async function getStockData(symbol: string) {
   try {
@@ -105,31 +107,29 @@ export async function getHistoricalData(symbol: string): Promise<{ date: string;
 
 export async function getStockNews(symbol: string): Promise<NewsArticle[]> {
   try {
-    const response = await fetch(
-      `${BASE_URL}/stock_news?tickers=${symbol}&limit=10&apikey=${API_KEY}`
-    );
+    const url = `https://www.marketwatch.com/investing/stock/${symbol}/news`;
+    const { data } = await axios.get(url);
+    const $ = cheerio.load(data);
 
-    if (response.status === 403) {
-      console.error('Error fetching stock news: Access forbidden (403)');
-      throw new Error('Failed to fetch stock news: Access forbidden');
-    }
+    const articles: NewsArticle[] = [];
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch stock news');
-    }
+    $('.article__content').each((index, element) => {
+      const title = $(element).find('.article__headline').text().trim();
+      const description = $(element).find('.article__summary').text().trim();
+      const url = $(element).find('a').attr('href');
+      const publishedAt = $(element).find('.article__timestamp').attr('datetime');
 
-    const data = await response.json();
+      if (title && description && url && publishedAt) {
+        articles.push({
+          title,
+          description,
+          url,
+          publishedAt
+        });
+      }
+    });
 
-    if (!Array.isArray(data)) {
-      throw new Error('Invalid news data format');
-    }
-
-    return data.map((item: any) => ({
-      title: item.title,
-      description: item.text,
-      url: item.url,
-      publishedAt: item.publishedDate
-    }));
+    return articles;
   } catch (error) {
     console.error('Error fetching stock news:', error);
     throw error;
