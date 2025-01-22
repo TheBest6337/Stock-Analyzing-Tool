@@ -59,7 +59,7 @@ export default function StockRecommendation({ stock }: Props) {
     else if (stock.metrics.currentRatio > 1) score += 7;
     
     if (stock.metrics.debtToEquity < 1) score += 15;
-    else if (.metrics.debtToEquity < 2) score += 7;
+    else if (stock.metrics.debtToEquity < 2) score += 7;
 
     // Peer Comparison Score (0-25 points)
     if (stock.metrics.pe < avgPeerMetrics.pe) score += 10;
