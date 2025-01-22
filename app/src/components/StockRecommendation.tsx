@@ -9,6 +9,7 @@ interface Props {
 
 export default function StockRecommendation({ stock }: Props) {
   const [score, setScore] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchPeerMetrics = async (symbol: string) => {
     return await getPeerMetrics(symbol);
@@ -19,6 +20,11 @@ export default function StockRecommendation({ stock }: Props) {
     
     // Fetch peer metrics
     const peerMetrics = await fetchPeerMetrics(stock.symbol);
+
+    if (!peerMetrics || peerMetrics.length === 0) {
+      setError('No peer metrics available');
+      return score;
+    }
 
     // P/E Score (0-25 points)
     if (stock.metrics.pe < 0) {
@@ -125,6 +131,15 @@ export default function StockRecommendation({ stock }: Props) {
         </div>
         <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{score !== null ? `${score}/100` : 'Calculating...'}</div>
       </div>
+
+      {error && (
+        <div className="mt-4 p-3 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg">
+          <p className="font-medium">⚠️ Error: {error}</p>
+          <p className="text-sm mt-1">
+            Unable to calculate score due to missing peer metrics. Please try again later.
+          </p>
+        </div>
+      )}
 
       <div className={`rounded-lg p-4 ${getRecommendationClass()}`}>
         <h3 className="text-lg font-semibold mb-2">Recommendation: {getRecommendationText()}</h3>
