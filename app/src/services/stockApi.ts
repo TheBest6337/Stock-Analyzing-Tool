@@ -59,7 +59,7 @@ export async function getStockData(symbol: string) {
 export async function getPeerMetrics(symbol: string) {
   try {
     const response = await fetch(
-      `https://financialmodelingprep.com/api/v4/stock_peers?symbol=${symbol}`
+      `${BASE_URL}/stock_peers?symbol=${symbol}&apikey=${API_KEY}`
     );
 
     if (!response.ok) {
@@ -68,44 +68,22 @@ export async function getPeerMetrics(symbol: string) {
 
     const data = await response.json();
 
-    if (!Array.isArray(data) || !data[0]?.peersList) {
+    if (!Array.isArray(data)) {
       throw new Error('Invalid peer metrics data format');
     }
 
-    const peersList = data[0].peersList;
-
-    const peerMetricsPromises = peersList.map(async (peerSymbol: string) => {
-      const [quoteRes, metricsRes] = await Promise.all([
-        fetch(`${BASE_URL}/quote/${peerSymbol}?apikey=${API_KEY}`),
-        fetch(`${BASE_URL}/key-metrics-ttm/${peerSymbol}?apikey=${API_KEY}`)
-      ]);
-
-      if (!quoteRes.ok || !metricsRes.ok) {
-        throw new Error(`Failed to fetch data for peer: ${peerSymbol}`);
-      }
-
-      const [quoteData, metricsData] = await Promise.all([
-        quoteRes.json(),
-        metricsRes.json()
-      ]);
-
-      const quote = quoteData?.[0] || {};
-      const metrics = metricsData?.[0] || {};
-
-      return {
-        symbol: peerSymbol,
-        pe: quote.pe || 0,
-        ps: Number((metrics.priceToSalesRatioTTM || 0).toFixed(2)),
-        volume: quote.volume || 0,
-        currentRatio: metrics.currentRatioTTM || 0,
-        debtToEquity: metrics.debtToEquityTTM || 0
-      };
-    });
-
-    return await Promise.all(peerMetricsPromises);
+    // Assuming the API returns an array of peer metrics
+    return data.map((item: any) => ({
+      symbol: item.symbol,
+      pe: item.pe,
+      ps: item.ps,
+      volume: item.volume,
+      currentRatio: item.currentRatio,
+      debtToEquity: item.debtToEquity
+    }));
   } catch (error) {
     console.error('Error fetching peer metrics:', error);
-    throw new Error(`Failed to fetch peer metrics: ${error.message || 'Unknown error'}`);
+    throw error;
   }
 }
 
