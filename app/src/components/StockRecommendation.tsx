@@ -59,7 +59,7 @@ export default function StockRecommendation({ stock }: Props) {
     else if (stock.metrics.currentRatio > 1) score += 7;
     
     if (stock.metrics.debtToEquity < 1) score += 15;
-    else if (stock.metrics.debtToEquity < 2) score += 7;
+    else if (.metrics.debtToEquity < 2) score += 7;
 
     // Peer Comparison Score (0-25 points)
     if (stock.metrics.pe < avgPeerMetrics.pe) score += 10;
@@ -110,20 +110,23 @@ export default function StockRecommendation({ stock }: Props) {
   };
 
   const PeerMetrics = ({ peerMetrics }: { peerMetrics: any[] }) => {
+    const avgPeerMetrics = {
+      pe: peerMetrics.reduce((acc, peer) => acc + peer.pe, 0) / peerMetrics.length,
+      ps: peerMetrics.reduce((acc, peer) => acc + peer.ps, 0) / peerMetrics.length,
+      volume: peerMetrics.reduce((acc, peer) => acc + peer.volume, 0) / peerMetrics.length,
+      currentRatio: peerMetrics.reduce((acc, peer) => acc + peer.currentRatio, 0) / peerMetrics.length,
+      debtToEquity: peerMetrics.reduce((acc, peer) => acc + peer.debtToEquity, 0) / peerMetrics.length
+    };
+
     return (
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">Peer Metrics</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {peerMetrics.map((peer, index) => (
-            <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <h4 className="font-medium text-gray-800 dark:text-gray-100">{peer.symbol}</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-300">P/E: {peer.pe}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">P/S: {peer.ps}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Volume: {peer.volume}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Current Ratio: {peer.currentRatio}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Debt to Equity: {peer.debtToEquity}</p>
-            </div>
-          ))}
+        <h3 className="text-lg font-semibold mb-2">Average Peer Metrics</h3>
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300">P/E: {avgPeerMetrics.pe.toFixed(2)}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">P/S: {avgPeerMetrics.ps.toFixed(2)}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Volume: {avgPeerMetrics.volume.toFixed(2)}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Current Ratio: {avgPeerMetrics.currentRatio.toFixed(2)}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Debt to Equity: {avgPeerMetrics.debtToEquity.toFixed(2)}</p>
         </div>
       </div>
     );
