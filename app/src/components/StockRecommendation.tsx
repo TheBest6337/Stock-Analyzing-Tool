@@ -26,6 +26,15 @@ export default function StockRecommendation({ stock }: Props) {
       return score;
     }
 
+    // Calculate average peer metrics
+    const avgPeerMetrics = {
+      pe: peerMetrics.reduce((acc, peer) => acc + peer.pe, 0) / peerMetrics.length,
+      ps: peerMetrics.reduce((acc, peer) => acc + peer.ps, 0) / peerMetrics.length,
+      volume: peerMetrics.reduce((acc, peer) => acc + peer.volume, 0) / peerMetrics.length,
+      currentRatio: peerMetrics.reduce((acc, peer) => acc + peer.currentRatio, 0) / peerMetrics.length,
+      debtToEquity: peerMetrics.reduce((acc, peer) => acc + peer.debtToEquity, 0) / peerMetrics.length
+    };
+
     // P/E Score (0-25 points)
     if (stock.metrics.pe < 0) {
       score += 5; // High risk score for negative P/E
@@ -53,11 +62,9 @@ export default function StockRecommendation({ stock }: Props) {
     else if (stock.metrics.debtToEquity < 2) score += 7;
 
     // Peer Comparison Score (0-25 points)
-    peerMetrics.forEach(peer => {
-      if (stock.metrics.pe < peer.pe) score += 10;
-      if (stock.metrics.ps < peer.ps) score += 10;
-      if (stock.metrics.volume > peer.volume) score += 5;
-    });
+    if (stock.metrics.pe < avgPeerMetrics.pe) score += 10;
+    if (stock.metrics.ps < avgPeerMetrics.ps) score += 10;
+    if (stock.metrics.volume > avgPeerMetrics.volume) score += 5;
     
     return score;
   };
