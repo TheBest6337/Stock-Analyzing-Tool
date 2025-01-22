@@ -6,9 +6,24 @@ interface Props {
 }
 
 export default function StockRecommendation({ stock }: Props) {
-  const calculateScore = (): number => {
+  const fetchPeerMetrics = async (symbol: string) => {
+    // Placeholder function to fetch peer metrics
+    // This should be replaced with actual API call to fetch peer metrics
+    return {
+      pe: 20,
+      ps: 3,
+      volume: 10000000,
+      currentRatio: 1.2,
+      debtToEquity: 1.5
+    };
+  };
+
+  const calculateScore = async (): Promise<number> => {
     let score = 0;
     
+    // Fetch peer metrics
+    const peerMetrics = await fetchPeerMetrics(stock.symbol);
+
     // P/E Score (0-25 points)
     if (stock.metrics.pe < 0) {
       score += 5; // High risk score for negative P/E
@@ -34,6 +49,11 @@ export default function StockRecommendation({ stock }: Props) {
     
     if (stock.metrics.debtToEquity < 1) score += 15;
     else if (stock.metrics.debtToEquity < 2) score += 7;
+
+    // Peer Comparison Score (0-25 points)
+    if (stock.metrics.pe < peerMetrics.pe) score += 10;
+    if (stock.metrics.ps < peerMetrics.ps) score += 10;
+    if (stock.metrics.volume > peerMetrics.volume) score += 5;
     
     return score;
   };

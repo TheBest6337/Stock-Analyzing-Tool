@@ -7,9 +7,10 @@ export async function getStockData(symbol: string) {
   try {
     console.log('Fetching data for symbol:', symbol);
 
-    const [quoteRes, metricsRes] = await Promise.all([
+    const [quoteRes, metricsRes, peerMetrics] = await Promise.all([
       fetch(`${BASE_URL}/quote/${symbol}?apikey=${API_KEY}`),
-      fetch(`${BASE_URL}/key-metrics-ttm/${symbol}?apikey=${API_KEY}`)
+      fetch(`${BASE_URL}/key-metrics-ttm/${symbol}?apikey=${API_KEY}`),
+      getPeerMetrics(symbol)
     ]);
 
     if (!quoteRes.ok || !metricsRes.ok) {
@@ -46,11 +47,43 @@ export async function getStockData(symbol: string) {
         dividendYield: quote.dividendYield || 0,
         profitMargin: metrics.netProfitMarginTTM || 0,
         returnOnEquity: metrics.roeTTM || 0
-      }
+      },
+      peerMetrics
     };
   } catch (error: any) {
     console.error('API Error:', error);
     throw new Error(`Failed to fetch stock data: ${error.message || 'Unknown error'}`);
+  }
+}
+
+export async function getPeerMetrics(symbol: string) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/stock_peers?symbol=${symbol}&apikey=${API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch peer metrics');
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid peer metrics data format');
+    }
+
+    // Assuming the API returns an array of peer metrics
+    return data.map((item: any) => ({
+      symbol: item.symbol,
+      pe: item.pe,
+      ps: item.ps,
+      volume: item.volume,
+      currentRatio: item.currentRatio,
+      debtToEquity: item.debtToEquity
+    }));
+  } catch (error) {
+    console.error('Error fetching peer metrics:', error);
+    throw error;
   }
 }
 
