@@ -1,11 +1,14 @@
 import { AlertCircle } from 'lucide-react';
 import { StockData } from '../types';
+import React, { useState, useEffect } from 'react';
 
 interface Props {
   stock: StockData;
 }
 
 export default function StockRecommendation({ stock }: Props) {
+  const [score, setScore] = useState<number | null>(null);
+
   const fetchPeerMetrics = async (symbol: string) => {
     // Placeholder function to fetch peer metrics
     // This should be replaced with actual API call to fetch peer metrics
@@ -58,9 +61,17 @@ export default function StockRecommendation({ stock }: Props) {
     return score;
   };
 
-  const score = calculateScore();
-  
+  useEffect(() => {
+    const fetchScore = async () => {
+      const calculatedScore = await calculateScore();
+      setScore(calculatedScore);
+    };
+
+    fetchScore();
+  }, [stock]);
+
   const getRecommendationClass = () => {
+    if (score === null) return '';
     if (score >= 80) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
     if (score >= 60) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
     if (score >= 40) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
@@ -68,6 +79,7 @@ export default function StockRecommendation({ stock }: Props) {
   };
 
   const getRecommendationText = () => {
+    if (score === null) return 'Calculating...';
     if (score >= 80) return 'Strong Buy';
     if (score >= 60) return 'Buy';
     if (score >= 40) return 'Hold';
@@ -98,7 +110,7 @@ export default function StockRecommendation({ stock }: Props) {
           <AlertCircle className="text-blue-600 dark:text-blue-400 mr-2" />
           <span className="text-lg font-medium">Overall Score</span>
         </div>
-        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{score}/100</div>
+        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{score !== null ? `${score}/100` : 'Calculating...'}</div>
       </div>
 
       <div className={`rounded-lg p-4 ${getRecommendationClass()}`}>
