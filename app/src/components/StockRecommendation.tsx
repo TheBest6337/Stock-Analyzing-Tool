@@ -1,6 +1,7 @@
 import { AlertCircle } from 'lucide-react';
 import { StockData } from '../types';
 import React, { useState, useEffect } from 'react';
+import { getPeerMetrics } from '../services/stockApi';
 
 interface Props {
   stock: StockData;
@@ -10,15 +11,7 @@ export default function StockRecommendation({ stock }: Props) {
   const [score, setScore] = useState<number | null>(null);
 
   const fetchPeerMetrics = async (symbol: string) => {
-    // Placeholder function to fetch peer metrics
-    // This should be replaced with actual API call to fetch peer metrics
-    return {
-      pe: 20,
-      ps: 3,
-      volume: 10000000,
-      currentRatio: 1.2,
-      debtToEquity: 1.5
-    };
+    return await getPeerMetrics(symbol);
   };
 
   const calculateScore = async (): Promise<number> => {
