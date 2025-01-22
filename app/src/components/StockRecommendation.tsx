@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react';
-import { StockData } from '../types';
+import { StockData, HistoricalDataPoint, ComparisonCompanyData } from '../types';
 
 interface Props {
   stock: StockData;
