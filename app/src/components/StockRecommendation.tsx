@@ -53,9 +53,11 @@ export default function StockRecommendation({ stock }: Props) {
     else if (stock.metrics.debtToEquity < 2) score += 7;
 
     // Peer Comparison Score (0-25 points)
-    if (stock.metrics.pe < peerMetrics.pe) score += 10;
-    if (stock.metrics.ps < peerMetrics.ps) score += 10;
-    if (stock.metrics.volume > peerMetrics.volume) score += 5;
+    peerMetrics.forEach(peer => {
+      if (stock.metrics.pe < peer.pe) score += 10;
+      if (stock.metrics.ps < peer.ps) score += 10;
+      if (stock.metrics.volume > peer.volume) score += 5;
+    });
     
     return score;
   };
