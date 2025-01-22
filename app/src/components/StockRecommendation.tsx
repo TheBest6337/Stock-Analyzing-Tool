@@ -94,6 +94,26 @@ export default function StockRecommendation({ stock }: Props) {
     return null;
   };
 
+  const PeerMetrics = ({ peerMetrics }: { peerMetrics: any[] }) => {
+    return (
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-2">Peer Metrics</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {peerMetrics.map((peer, index) => (
+            <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h4 className="font-medium text-gray-800 dark:text-gray-100">{peer.symbol}</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">P/E: {peer.pe}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">P/S: {peer.ps}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Volume: {peer.volume}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Current Ratio: {peer.currentRatio}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Debt to Equity: {peer.debtToEquity}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
       <h2 className="text-2xl font-semibold mb-6">Investment Recommendation</h2>
@@ -116,6 +136,8 @@ export default function StockRecommendation({ stock }: Props) {
       </div>
 
       {getPEWarning()}
+
+      <PeerMetrics peerMetrics={stock.peerMetrics} />
     </div>
   );
 }
