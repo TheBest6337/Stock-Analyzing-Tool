@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function StockRecommendation({ stock }: Props) {
-  const calculateScore = (): number => {
+  const calculateScore = async (): Promise<number> => {
     let score = 0;
     
     // P/E Score (0-25 points)
@@ -34,11 +34,56 @@ export default function StockRecommendation({ stock }: Props) {
     
     if (stock.metrics.debtToEquity < 1) score += 15;
     else if (stock.metrics.debtToEquity < 2) score += 7;
+
+    // Historical Performance Score (0-25 points)
+    const historicalPerformanceScore = calculateHistoricalPerformanceScore(stock.historicalData);
+    score += historicalPerformanceScore;
+
+    // Peer Comparison Score (0-25 points)
+    const comparisonCompanies = await getComparisonCompanies(stock.symbol);
+    const peerComparisonScore = calculatePeerComparisonScore(stock, comparisonCompanies);
+    score += peerComparisonScore;
     
     return score;
   };
 
-  const score = calculateScore();
+  const calculateHistoricalPerformanceScore = (historicalData: HistoricalDataPoint[]): number => {
+    // Implement logic to calculate score based on historical performance
+    // For simplicity, let's assume we give a score based on the average price change over the past year
+    if (historicalData.length < 2) return 0;
+
+    const firstPrice = historicalData[0].price;
+    const lastPrice = historicalData[historicalData.length - 1].price;
+    const percentageChange = ((lastPrice - firstPrice) / firstPrice) * 100;
+
+    if (percentageChange > 50) return 25;
+    if (percentageChange > 20) return 15;
+    if (percentageChange > 0) return 5;
+    return 0;
+  };
+
+  const getComparisonCompanies = async (symbol: string): Promise<ComparisonCompanyData[]> => {
+    // Implement logic to fetch comparison companies' data
+    // For simplicity, let's assume we fetch data from an API
+    const response = await fetch(`/api/comparison-companies?symbol=${symbol}`);
+    const data = await response.json();
+    return data;
+  };
+
+  const calculatePeerComparisonScore = (stock: StockData, comparisonCompanies: ComparisonCompanyData[]): number => {
+    // Implement logic to calculate score based on peer comparison
+    // For simplicity, let's assume we compare the P/E and P/S ratios with the average of comparison companies
+    const averagePE = comparisonCompanies.reduce((sum, company) => sum + company.metrics.pe, 0) / comparisonCompanies.length;
+    const averagePS = comparisonCompanies.reduce((sum, company) => sum + company.metrics.ps, 0) / comparisonCompanies.length;
+
+    let score = 0;
+    if (stock.metrics.pe < averagePE) score += 10;
+    if (stock.metrics.ps < averagePS) score += 10;
+
+    return score;
+  };
+
+  const score = await calculateScore();
   
   const getRecommendationClass = () => {
     if (score >= 80) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
@@ -85,8 +130,8 @@ export default function StockRecommendation({ stock }: Props) {
         <h3 className="text-lg font-semibold mb-2">Recommendation: {getRecommendationText()}</h3>
         <p className="text-sm">
           This recommendation is based on fundamental analysis including P/E ratio, P/S ratio,
-          trading volume, and financial health metrics. Always conduct your own research before
-          making investment decisions.
+          trading volume, financial health metrics, historical performance, and peer comparison.
+          Always conduct your own research before making investment decisions.
         </p>
       </div>
 

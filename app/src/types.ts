@@ -23,6 +23,7 @@ export interface StockData {
     returnOnEquity: number;
   };
   historicalData: HistoricalDataPoint[];
+  comparisonCompanies: ComparisonCompanyData[];
 }
 
 export type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y';
@@ -32,4 +33,18 @@ export interface NewsArticle {
   description: string;
   url: string;
   publishedAt: string;
+}
+
+export interface ComparisonCompanyData {
+  symbol: string;
+  name: string;
+  metrics: {
+    pe: number;
+    ps: number;
+    volume: number;
+    marketCap: number;
+    priceToBook: number;
+    debtToEquity: number;
+    currentRatio: number;
+  };
 }
