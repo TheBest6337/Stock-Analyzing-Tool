@@ -58,34 +58,7 @@ export async function getStockData(symbol: string) {
 }
 
 export async function getPeerMetrics(symbol: string) {
-  try {
-    const response = await fetch(
-      `${BASE_URL}/stock_peers?symbol=${symbol}&apikey=${API_KEY}`
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch peer metrics');
-    }
-
-    const data = await response.json();
-
-    if (!Array.isArray(data)) {
-      throw new Error('Invalid peer metrics data format');
-    }
-
-    // Assuming the API returns an array of peer metrics
-    return data.map((item: any) => ({
-      symbol: item.symbol,
-      pe: item.pe,
-      ps: item.ps,
-      volume: item.volume,
-      currentRatio: item.currentRatio,
-      debtToEquity: item.debtToEquity
-    }));
-  } catch (error) {
-    console.error('Error fetching peer metrics:', error);
-    return getStaticPeerMetrics(symbol);
-  }
+  return getStaticPeerMetrics(symbol);
 }
 
 function getStaticPeerMetrics(symbol: string) {
