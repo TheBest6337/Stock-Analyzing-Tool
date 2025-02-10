@@ -2,7 +2,10 @@
 
 A React-based stock analysis tool that provides technical indicators and investment recommendations based on fundamental analysis.
 
-![Screenshot 2025-01-16 115708](https://github.com/user-attachments/assets/39ad0c78-fe3f-42c8-9cfb-16985d4cb4f5)
+![image](https://github.com/user-attachments/assets/5cdaac7f-1e95-49f2-b7a1-9fa69de71abc)
+![image](https://github.com/user-attachments/assets/3bd3724a-13ac-435e-aca1-8929aef8ea4c)
+
+
 
 ## Features
 
@@ -25,7 +28,7 @@ This project is currently under development. Future features may include:
 
 ### Roadmap
 
-- [ ] Better score evaluation
+- [x] Better score evaluation
 - [ ] Compare with other stocks
 - [x] News information
 - [ ] Multi-lanuage support
