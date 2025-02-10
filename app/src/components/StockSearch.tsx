@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getStockData, searchCompanies, getHistoricalData } from '../services/stockApi';
 import { StockData } from '../types';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 interface Props {
   onStockSelect: (stock: StockData | null) => void;
@@ -87,7 +88,7 @@ export default function StockSearch({ onStockSelect }: Props) {
           ))}
         </div>
       )}
-      {loading && <div className="mt-4 text-center">Loading stock data...</div>}
+      {loading && <div className="mt-4 text-center"><ClipLoader color="#0000ff" loading={loading} size={35} /></div>}
     </div>
   );
 }
