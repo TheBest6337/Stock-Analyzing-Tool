@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { getStockData, searchCompanies, getHistoricalData } from '../services/stockApi';
 import { StockData } from '../types';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -12,6 +12,8 @@ export default function StockSearch({ onStockSelect }: Props) {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
   const [loading, setLoading] = useState(false);
+  const lastSelectedSymbol = useRef<string | null>(null);
+  const selectionTimeout = useRef<number | null>(null);
 
   const handleSearch = async () => {
     if (!query) {
@@ -34,6 +36,22 @@ export default function StockSearch({ onStockSelect }: Props) {
   };
 
   const handleSelectStock = async (symbol: string) => {
+    // Prevent duplicate selections within 1 second
+    if (symbol === lastSelectedSymbol.current) {
+      return;
+    }
+
+    // Clear any pending selection timeout
+    if (selectionTimeout.current) {
+      window.clearTimeout(selectionTimeout.current);
+    }
+
+    // Set the current symbol and clear it after 1 second
+    lastSelectedSymbol.current = symbol;
+    selectionTimeout.current = window.setTimeout(() => {
+      lastSelectedSymbol.current = null;
+    }, 1000);
+
     setLoading(true);
     const loadingToast = toast.loading(`Loading data for ${symbol}...`);
     try {
