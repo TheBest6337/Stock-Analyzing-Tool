@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getStockNews } from '../services/stockApi';
 import { NewsArticle } from '../types';
+import toast from 'react-hot-toast';
 
 interface StockNewsProps {
   symbol: string;
@@ -14,10 +15,13 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
 
   useEffect(() => {
     const fetchNews = async () => {
+      const loadingToast = toast.loading('Loading news...');
       try {
         const newsData = await getStockNews(symbol);
         setNews(newsData);
+        toast.success('News loaded successfully', { id: loadingToast });
       } catch (err: any) {
+        toast.error(err.message || 'Failed to load news', { id: loadingToast });
         setError(err.message);
       } finally {
         setLoading(false);

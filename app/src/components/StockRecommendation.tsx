@@ -2,6 +2,7 @@ import { AlertCircle } from 'lucide-react';
 import { StockData } from '../types';
 import { useState, useEffect } from 'react';
 import { getPeerMetrics } from '../services/stockApi';
+import toast from 'react-hot-toast';
 
 interface Props {
   stock: StockData;
@@ -82,102 +83,109 @@ export default function StockRecommendation({ stock }: Props) {
   };
 
   const calculateScore = async (): Promise<number> => {
-    const breakdown: { [key: string]: number } = {};
-    let totalScore = 0;
-    
-    // Fetch peer metrics
-    const peerMetrics = await fetchPeerMetrics(stock.symbol);
+    const loadingToast = toast.loading('Calculating recommendation score...');
+    try {
+      const breakdown: { [key: string]: number } = {};
+      let totalScore = 0;
+      
+      // Fetch peer metrics
+      const peerMetrics = await fetchPeerMetrics(stock.symbol);
 
-    if (!peerMetrics || peerMetrics.length === 0) {
-      setError('No peer metrics available');
-      return totalScore;
-    }
+      if (!peerMetrics || peerMetrics.length === 0) {
+        toast.error('No peer metrics available', { id: loadingToast });
+        return totalScore;
+      }
 
-    // Calculate average peer metrics
-    const avgPeerMetrics = {
-      pe: peerMetrics.reduce((acc, peer) => acc + peer.pe, 0) / peerMetrics.length,
-      ps: peerMetrics.reduce((acc, peer) => acc + peer.ps, 0) / peerMetrics.length,
-      volume: peerMetrics.reduce((acc, peer) => acc + peer.volume, 0) / peerMetrics.length,
-      currentRatio: peerMetrics.reduce((acc, peer) => acc + peer.currentRatio, 0) / peerMetrics.length,
-      debtToEquity: peerMetrics.reduce((acc, peer) => acc + peer.debtToEquity, 0) / peerMetrics.length
-    };
+      // Calculate average peer metrics
+      const avgPeerMetrics = {
+        pe: peerMetrics.reduce((acc, peer) => acc + peer.pe, 0) / peerMetrics.length,
+        ps: peerMetrics.reduce((acc, peer) => acc + peer.ps, 0) / peerMetrics.length,
+        volume: peerMetrics.reduce((acc, peer) => acc + peer.volume, 0) / peerMetrics.length,
+        currentRatio: peerMetrics.reduce((acc, peer) => acc + peer.currentRatio, 0) / peerMetrics.length,
+        debtToEquity: peerMetrics.reduce((acc, peer) => acc + peer.debtToEquity, 0) / peerMetrics.length
+      };
 
-    // 1. Valuation Metrics (30 points total)
-    let valuationScore = 0;
-    
-    // P/E Score (0-15 points)
-    if (stock.metrics.pe > 0) {
+      // 1. Valuation Metrics (30 points total)
+      let valuationScore = 0;
+      
+      // P/E Score (0-15 points)
+      if (stock.metrics.pe > 0) {
+        valuationScore += calculateMetricScore(
+          stock.metrics.pe,
+          [[0, 15], [15, 25], [25, 35], [35, 50], [50, Infinity]],
+          [15, 12, 8, 4, 0]
+        );
+      } else {
+        valuationScore += 3; // Negative P/E gets a low score
+      }
+      
+      // P/S Score (0-15 points)
       valuationScore += calculateMetricScore(
-        stock.metrics.pe,
-        [[0, 15], [15, 25], [25, 35], [35, 50], [50, Infinity]],
+        stock.metrics.ps,
+        [[0, 2], [2, 4], [4, 6], [6, 10], [10, Infinity]],
         [15, 12, 8, 4, 0]
       );
-    } else {
-      valuationScore += 3; // Negative P/E gets a low score
+      
+      breakdown.valuation = valuationScore;
+      totalScore += valuationScore;
+
+      // 2. Financial Health (25 points total)
+      let healthScore = 0;
+      
+      // Current Ratio (0-12 points)
+      healthScore += calculateMetricScore(
+        stock.metrics.currentRatio,
+        [[0, 1], [1, 1.5], [1.5, 2], [2, 3], [3, Infinity]],
+        [3, 6, 12, 9, 6]
+      );
+      
+      // Debt to Equity (0-13 points)
+      healthScore += calculateMetricScore(
+        stock.metrics.debtToEquity,
+        [[0, 0.3], [0.3, 0.6], [0.6, 1], [1, 2], [2, Infinity]],
+        [13, 10, 7, 4, 0]
+      );
+      
+      breakdown.health = healthScore;
+      totalScore += healthScore;
+
+      // 3. Market Activity (15 points total)
+      const volumeScore = calculateMetricScore(
+        stock.metrics.volume,
+        [[0, 500000], [500000, 2000000], [2000000, 5000000], [5000000, 20000000], [20000000, Infinity]],
+        [0, 4, 8, 12, 15]
+      );
+      
+      breakdown.volume = volumeScore;
+      totalScore += volumeScore;
+
+      // 4. Peer Comparison (15 points total)
+      let peerScore = 0;
+      
+      if (stock.metrics.pe < avgPeerMetrics.pe && stock.metrics.pe > 0) peerScore += 5;
+      if (stock.metrics.ps < avgPeerMetrics.ps) peerScore += 5;
+      if (stock.metrics.currentRatio > avgPeerMetrics.currentRatio) peerScore += 3;
+      if (stock.metrics.debtToEquity < avgPeerMetrics.debtToEquity) peerScore += 2;
+      
+      breakdown.peerComparison = peerScore;
+      totalScore += peerScore;
+
+      // 5. Technical Analysis (15 points total)
+      const trendScore = calculateTrendScore(stock.historicalData);
+      const volatilityScore = calculateVolatilityScore(stock.historicalData);
+      
+      // Ensure total technical score doesn't exceed 15 points
+      const technicalScore = Math.min(trendScore + volatilityScore, 15);
+      breakdown.technical = technicalScore;
+      totalScore += technicalScore;
+
+      setScoreBreakdown(breakdown);
+      toast.success('Score calculated successfully', { id: loadingToast });
+      return Math.round(totalScore);
+    } catch (err: any) {
+      toast.error('Failed to calculate recommendation score', { id: loadingToast });
+      return 0;
     }
-    
-    // P/S Score (0-15 points)
-    valuationScore += calculateMetricScore(
-      stock.metrics.ps,
-      [[0, 2], [2, 4], [4, 6], [6, 10], [10, Infinity]],
-      [15, 12, 8, 4, 0]
-    );
-    
-    breakdown.valuation = valuationScore;
-    totalScore += valuationScore;
-
-    // 2. Financial Health (25 points total)
-    let healthScore = 0;
-    
-    // Current Ratio (0-12 points)
-    healthScore += calculateMetricScore(
-      stock.metrics.currentRatio,
-      [[0, 1], [1, 1.5], [1.5, 2], [2, 3], [3, Infinity]],
-      [3, 6, 12, 9, 6]
-    );
-    
-    // Debt to Equity (0-13 points)
-    healthScore += calculateMetricScore(
-      stock.metrics.debtToEquity,
-      [[0, 0.3], [0.3, 0.6], [0.6, 1], [1, 2], [2, Infinity]],
-      [13, 10, 7, 4, 0]
-    );
-    
-    breakdown.health = healthScore;
-    totalScore += healthScore;
-
-    // 3. Market Activity (15 points total)
-    const volumeScore = calculateMetricScore(
-      stock.metrics.volume,
-      [[0, 500000], [500000, 2000000], [2000000, 5000000], [5000000, 20000000], [20000000, Infinity]],
-      [0, 4, 8, 12, 15]
-    );
-    
-    breakdown.volume = volumeScore;
-    totalScore += volumeScore;
-
-    // 4. Peer Comparison (15 points total)
-    let peerScore = 0;
-    
-    if (stock.metrics.pe < avgPeerMetrics.pe && stock.metrics.pe > 0) peerScore += 5;
-    if (stock.metrics.ps < avgPeerMetrics.ps) peerScore += 5;
-    if (stock.metrics.currentRatio > avgPeerMetrics.currentRatio) peerScore += 3;
-    if (stock.metrics.debtToEquity < avgPeerMetrics.debtToEquity) peerScore += 2;
-    
-    breakdown.peerComparison = peerScore;
-    totalScore += peerScore;
-
-    // 5. Technical Analysis (15 points total)
-    const trendScore = calculateTrendScore(stock.historicalData);
-    const volatilityScore = calculateVolatilityScore(stock.historicalData);
-    
-    // Ensure total technical score doesn't exceed 15 points
-    const technicalScore = Math.min(trendScore + volatilityScore, 15);
-    breakdown.technical = technicalScore;
-    totalScore += technicalScore;
-
-    setScoreBreakdown(breakdown);
-    return Math.round(totalScore);
   };
 
   useEffect(() => {
