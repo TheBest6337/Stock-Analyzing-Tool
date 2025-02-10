@@ -29,7 +29,7 @@ This project is currently under development. Future features may include:
 - [x] Better score evaluation
 - [ ] Compare with other stocks
 - [x] News information
-- [ ] Multi-lanuage support
+- [ ] Multi-language support
 - [x] Dark mode
 
 ## Prerequisites
