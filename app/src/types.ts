@@ -3,6 +3,15 @@ export interface HistoricalDataPoint {
   price: number;
 }
 
+export interface PeerMetrics {
+  symbol: string;
+  pe: number;
+  ps: number;
+  volume: number;
+  currentRatio: number;
+  debtToEquity: number;
+}
+
 export interface StockData {
   symbol: string;
   name: string;
@@ -23,6 +32,7 @@ export interface StockData {
     returnOnEquity: number;
   };
   historicalData: HistoricalDataPoint[];
+  peerMetrics: PeerMetrics[];
 }
 
 export type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y';

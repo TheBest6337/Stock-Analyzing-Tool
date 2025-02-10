@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { getStockData, searchCompanies, getHistoricalData } from '../services/stockApi';
 import { StockData } from '../types';
+import ClipLoader from 'react-spinners/ClipLoader';
+import toast from 'react-hot-toast';
 
 interface Props {
   onStockSelect: (stock: StockData | null) => void;
@@ -10,32 +12,58 @@ export default function StockSearch({ onStockSelect }: Props) {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const lastSelectedSymbol = useRef<string | null>(null);
+  const selectionTimeout = useRef<number | null>(null);
 
   const handleSearch = async () => {
-    if (!query) return;
+    if (!query) {
+      toast.error('Please enter a search query');
+      return;
+    }
     
     setLoading(true);
-    setError('');
     try {
       const results = await searchCompanies(query);
+      if (results.length === 0) {
+        toast.error('No companies found matching your search');
+      }
       setSearchResults(results);
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message || 'Failed to search companies');
       setSearchResults([]);
     }
     setLoading(false);
   };
 
   const handleSelectStock = async (symbol: string) => {
+    // Prevent duplicate selections within 1 second
+    if (symbol === lastSelectedSymbol.current) {
+      return;
+    }
+
+    // Clear any pending selection timeout
+    if (selectionTimeout.current) {
+      window.clearTimeout(selectionTimeout.current);
+    }
+
+    // Set the current symbol and clear it after 1 second
+    lastSelectedSymbol.current = symbol;
+    selectionTimeout.current = window.setTimeout(() => {
+      lastSelectedSymbol.current = null;
+    }, 1000);
+
     setLoading(true);
-    setError('');
+    const loadingToast = toast.loading(`Loading data for ${symbol}...`);
     try {
       const [stockData, historicalData] = await Promise.all([
         getStockData(symbol),
         getHistoricalData(symbol)
       ]);
       
+      if (!stockData) {
+        throw new Error('Failed to fetch stock data');
+      }
+
       onStockSelect({
         ...stockData,
         historicalData: historicalData.map(d => ({
@@ -45,8 +73,14 @@ export default function StockSearch({ onStockSelect }: Props) {
       });
       setSearchResults([]);
       setQuery('');
+      toast.success(`Successfully loaded ${symbol} data`, {
+        id: loadingToast
+      });
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message || `Failed to load ${symbol} data`, {
+        id: loadingToast
+      });
+      onStockSelect(null);
     }
     setLoading(false);
   };
@@ -60,6 +94,11 @@ export default function StockSearch({ onStockSelect }: Props) {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by company name or symbol..."
           className="flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-black dark:text-white"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch();
+            }
+          }}
         />
         <button
           onClick={handleSearch}
@@ -69,10 +108,6 @@ export default function StockSearch({ onStockSelect }: Props) {
           {loading ? 'Searching...' : 'Search'}
         </button>
       </div>
-
-      {error && (
-        <div className="mt-2 text-red-500">{error}</div>
-      )}
 
       {searchResults.length > 0 && (
         <div className="mt-2 border rounded divide-y">
@@ -87,7 +122,7 @@ export default function StockSearch({ onStockSelect }: Props) {
           ))}
         </div>
       )}
-      {loading && <div className="mt-4 text-center">Loading stock data...</div>}
+      {loading && <div className="mt-4 text-center"><ClipLoader color="#0000ff" loading={loading} size={35} /></div>}
     </div>
   );
 }
