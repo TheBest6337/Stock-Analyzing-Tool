@@ -38,18 +38,17 @@ This project is currently under development. Future features may include:
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed on your system:
+Ensure you have the following installed:
 - Node.js (version 16.0 or higher)
-- npm (Node Package Manager, usually comes with Node.js)
+- npm (comes with Node.js)
 
-You can check if you have these installed by running:
+Check your installations:
 ```sh
 node --version
 npm --version
 ```
 
-If you need to install these tools:
-- Node.js & npm: Download from [nodejs.org](https://nodejs.org/)
+If not installed, download from [nodejs.org](https://nodejs.org/).
 
 ## Setup
 
@@ -57,7 +56,7 @@ If you need to install these tools:
 ```sh
 git clone https://github.com/user/Stock-Analyzing-Tool.git
 ```
-2. Change into the application directory:
+2. Navigate to the application directory:
 ```sh
 cd Stock-Analyzing-Tool/app
 ```
@@ -65,15 +64,15 @@ cd Stock-Analyzing-Tool/app
 ```sh
 npm install
 ```
-4. Create a `.env` file in the root directory with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
+4. Create a `.env` file in the app directory with your API keys:
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
-```
-5. If you want to see the latest news, obtain your API key from [News API](https://newsapi.org/) and add the following line to the `.env` file:
-```sh
 VITE_NEWS_API_KEY=your_news_api_key_here
 ```
-6. Run the development server:
+   - Get your Financial Modeling Prep API key [here](https://site.financialmodelingprep.com/)
+   - Get your News API key [here](https://newsapi.org/)
+
+5. Start the development server:
 ```sh
 npm run dev
 ```
