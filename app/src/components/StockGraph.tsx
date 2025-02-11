@@ -203,7 +203,7 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
               stroke={gradientColor}
               fill="url(#colorGradient)"
               strokeWidth={2.5}
-              animationDuration={750}
+              animationDuration={550}
               animationEasing="ease-in-out"
             />
           </AreaChart>
