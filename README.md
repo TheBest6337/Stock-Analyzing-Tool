@@ -59,7 +59,7 @@ git clone https://github.com/user/Stock-Analyzing-Tool.git
 ```
 2. Change into the application directory:
 ```sh
-cd Stock-Analyzing-Tool
+cd Stock-Analyzing-Tool/app
 ```
 3. Install dependencies:
 ```sh
@@ -73,8 +73,7 @@ VITE_FMP_API_KEY=your_api_key_here
 ```sh
 VITE_NEWS_API_KEY=your_news_api_key_here
 ```
-6. Ensure that the `.gitignore` file includes `.env` to prevent the API key from being committed to the repository.
-7. Run the development server:
+6. Run the development server:
 ```sh
 npm run dev
 ```
