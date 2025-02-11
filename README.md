@@ -2,6 +2,10 @@
 
 A React-based stock analysis tool that provides technical indicators and investment recommendations based on fundamental analysis.
 
+![GitHub last commit](https://img.shields.io/github/last-commit/thebest6337/Stock-Analyzing-Tool)
+![GitHub issues](https://img.shields.io/github/issues/thebest6337/Stock-Analyzing-Tool)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/thebest6337/Stock-Analyzing-Tool)
+
 <img src="https://github.com/user-attachments/assets/5cdaac7f-1e95-49f2-b7a1-9fa69de71abc" width="600px" style="border-radius: 15px; overflow: hidden;" />
 <img src="https://github.com/user-attachments/assets/d6311ed4-130d-43c0-9b51-9b8d5b761f43" width="600px" style="border-radius: 15px; overflow: hidden;" />
 
@@ -49,25 +53,28 @@ If you need to install these tools:
 
 ## Setup
 
-1. Clone the repository
+1. Clone the repository:
+```sh
+git clone https://github.com/user/Stock-Analyzing-Tool.git
+```
 2. Change into the application directory:
 ```sh
-cd app
+cd Stock-Analyzing-Tool
 ```
 3. Install dependencies:
 ```sh
 npm install
 ```
-4. Create a ```.env``` file in the ```app``` directory with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
+4. Create a `.env` file in the root directory with your API key that you can get for free from [Financial Modeling Prep](https://site.financialmodelingprep.com/):
 ```sh
 VITE_FMP_API_KEY=your_api_key_here
 ```
-5. if you want to see the latest news, obtain your API key from [News API](https://newsapi.org/) and add the following line to the `.env` file:
+5. If you want to see the latest news, obtain your API key from [News API](https://newsapi.org/) and add the following line to the `.env` file:
 ```sh
 VITE_NEWS_API_KEY=your_news_api_key_here
 ```
-7. Ensure that the `.gitignore` file includes `.env` to prevent the API key from being committed to the repository.
-8. Run the development server:
+6. Ensure that the `.gitignore` file includes `.env` to prevent the API key from being committed to the repository.
+7. Run the development server:
 ```sh
 npm run dev
 ```
