@@ -10,7 +10,7 @@ import { Sun, Moon } from 'lucide-react';
 
 function App() {
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true); // Set dark mode as default
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
