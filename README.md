@@ -2,8 +2,8 @@
 
 A React-based stock analysis tool that provides technical indicators and investment recommendations based on fundamental analysis.
 
-<img src="https://github.com/user-attachments/assets/5cdaac7f-1e95-49f2-b7a1-9fa69de71abc" width="600px" style="border-radius: 15px;" />
-<img src="https://github.com/user-attachments/assets/d6311ed4-130d-43c0-9b51-9b8d5b761f43" width="600px" style="border-radius: 15px;" />
+<img src="https://github.com/user-attachments/assets/5cdaac7f-1e95-49f2-b7a1-9fa69de71abc" width="600px" style="border-radius: 15px; overflow: hidden;" />
+<img src="https://github.com/user-attachments/assets/d6311ed4-130d-43c0-9b51-9b8d5b761f43" width="600px" style="border-radius: 15px; overflow: hidden;" />
 
 ## Features
 
