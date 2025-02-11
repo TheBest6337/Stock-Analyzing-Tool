@@ -11,7 +11,6 @@ import {
   Tooltip,
   Legend,
   ChartOptions,
-  ScriptableContext,
   ChartEvent
 } from 'chart.js';
 
@@ -159,7 +158,8 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
       y: {
         beginAtZero: false,
         ticks: {
-          callback: (value: number): string => {
+          callback: (tickValue: string | number): string => {
+            const value = typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue;
             return '$' + value.toFixed(2);
           }
         }
