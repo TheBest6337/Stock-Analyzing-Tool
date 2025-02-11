@@ -1,28 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { StockData, TimeRange, HistoricalDataPoint } from '../types';
-import { Line } from 'react-chartjs-2';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
   Tooltip,
-  Legend,
-  ChartOptions,
-  ChartEvent
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+  CartesianGrid
+} from 'recharts';
+import debounce from 'lodash/debounce';
 
 interface StockGraphProps {
   stock: StockData;
@@ -30,11 +17,12 @@ interface StockGraphProps {
 
 const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
   const [timeRange, setTimeRange] = useState<TimeRange>('1M');
-  const [hoverValue, setHoverValue] = useState<{ price: number; change: number } | null>(null);
-  
+  const [tooltipPosition, setTooltipPosition] = useState<{ x: number, y: number } | null>(null);
+  const [displayValue, setDisplayValue] = useState<{ price: number; change: number } | null>(null);
+
   if (!stock.historicalData?.length) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center text-gray-600 dark:text-gray-300">
+      <div className="backdrop-blur-xl bg-white/50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl text-center text-gray-600 dark:text-gray-300">
         No historical data available
       </div>
     );
@@ -49,147 +37,114 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
     return ((lastPrice - firstPrice) / firstPrice) * 100;
   };
 
-  const getPercentageColor = (percentage: number) => {
-    return percentage >= 0 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)';
-  };
-
   const filteredData = () => {
     const data = [...stock.historicalData];
     
     switch(timeRange) {
-      case '1W':
-        return data.slice(-7);
-      case '1M':
-        return data.slice(-30);
-      case '3M':
-        return data.slice(-90);
-      case '1Y':
-        return data;
-      default:
-        return data;
+      case '1W': return data.slice(-7);
+      case '1M': return data.slice(-30);
+      case '3M': return data.slice(-90);
+      case '1Y': return data;
+      default: return data;
     }
   };
 
   const currentData = filteredData();
   const percentageChange = calculatePercentageChange(currentData);
-  const lineColor = getPercentageColor(percentageChange);
+  const isPositive = percentageChange >= 0;
+  const gradientColor = isPositive ? '#22c55e' : '#ef4444';
 
-  const chartData = {
-    labels: currentData.map(d => d.date),
-    datasets: [
-      {
-        label: `${stock.symbol} Price`,
-        data: currentData.map(d => d.price),
-        borderColor: lineColor,
-        backgroundColor: lineColor,
-        tension: 0.4,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        cubicInterpolationMode: 'monotone' as const
-      }
-    ]
+  const formatDate = (date: string) => {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric'
+    }).format(new Date(date));
   };
 
-  const getMostRecentValues = () => {
+  const formatPrice = (price: number) => `$${price.toFixed(2)}`;
+
+  const getMostRecentValues = useCallback(() => {
     const lastPrice = currentData[currentData.length - 1].price;
     const firstPrice = currentData[0].price;
     const changePercent = ((lastPrice - firstPrice) / firstPrice) * 100;
     return { price: lastPrice, change: changePercent };
-  };
+  }, [currentData]);
 
-  const displayValues = hoverValue || getMostRecentValues();
+  const debouncedSetTooltipPosition = useMemo(
+    () => debounce((pos: { x: number, y: number } | null) => {
+      setTooltipPosition(pos);
+    }, 50),
+    []
+  );
 
-  const options: ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: true,
-    aspectRatio: 2,
-    interaction: {
-      intersect: false,
-      mode: 'index' as const,
-    },
-    plugins: {
-      legend: {
-        display: false, // Hide legend since we show value above
-      },
-      tooltip: {
-        enabled: false, // Disable default tooltip
-      },
-    },
-    onHover: (event: ChartEvent, elements: any[]) => {
-      if (!event || !elements) return;
+  const CustomTooltip = ({ active, payload, coordinate }: any) => {
+    if (active && payload && payload.length) {
+      const currentPrice = payload[0].value;
+      const firstPrice = currentData[0].price;
+      const changePercent = ((currentPrice - firstPrice) / firstPrice) * 100;
       
-      const newValue = elements.length > 0
-        ? (() => {
-            const dataIndex = elements[0].index;
-            const currentPrice = currentData[dataIndex].price;
-            const startPrice = currentData[0].price;
-            const changePercent = ((currentPrice - startPrice) / startPrice) * 100;
-            return { price: currentPrice, change: changePercent };
-          })()
-        : getMostRecentValues();
+      // Update display values immediately
+      setDisplayValue({ price: currentPrice, change: changePercent });
+      // Debounce only the tooltip position
+      debouncedSetTooltipPosition(coordinate);
 
-      if (!hoverValue || 
-          hoverValue.price !== newValue.price || 
-          hoverValue.change !== newValue.change) {
-        setHoverValue(newValue);
-      }
-    },
-    scales: {
-      x: {
-        ticks: {
-          maxRotation: 45,
-          minRotation: 45,
-          autoSkip: true,
-          maxTicksLimit: 10,
-          callback: (value: number | string): string => {
-            const index = typeof value === 'string' ? parseInt(value, 10) : value;
-            const date = new Date(currentData[index].date);
-            return new Intl.DateTimeFormat('en-US', {
-              month: 'short',
-              day: 'numeric'
-            }).format(date);
-          }
-        },
-        grid: {
-          display: false
-        }
-      },
-      y: {
-        beginAtZero: false,
-        ticks: {
-          callback: (tickValue: string | number): string => {
-            const value = typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue;
-            return '$' + value.toFixed(2);
-          }
-        }
-      }
+      if (!tooltipPosition) return null;
+
+      return (
+        <div
+          className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transform transition-transform duration-75 ease-out"
+          style={{
+            transform: 'translate(-50%, -100%)',
+            position: 'fixed',
+            left: tooltipPosition.x,
+            top: tooltipPosition.y - 16,
+            pointerEvents: 'none'
+          }}
+        >
+          <p className="text-gray-600 dark:text-gray-300">{formatDate(payload[0].payload.date)}</p>
+          <p className="font-bold text-gray-900 dark:text-white">{formatPrice(currentPrice)}</p>
+        </div>
+      );
     }
+    return null;
   };
+
+  // Get the values to display (either hover values or most recent)
+  const valuesToDisplay = displayValue || getMostRecentValues();
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-lg font-semibold space-y-1">
-          <div className="text-gray-900 dark:text-gray-100">
-            ${displayValues.price.toFixed(2)}
+    <div className="backdrop-blur-xl bg-white/50 dark:bg-gray-800/50 p-8 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl transition-all duration-300 ease-in-out h-full">
+      <div className="flex items-center justify-between mb-6">
+        <div className="space-y-2">
+          <div className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 transition-colors duration-200">
+            ${valuesToDisplay.price.toFixed(2)}
           </div>
-          <div className={`${
-            displayValues.change >= 0 ? 'text-green-500' : 'text-red-500'
+          <div className={`text-lg font-medium transition-colors duration-200 ${
+            isPositive ? 'text-green-500' : 'text-red-500'
           }`}>
-            {displayValues.change >= 0 ? '+' : ''}
-            {displayValues.change.toFixed(2)}%
+            <span className="inline-flex items-center">
+              {isPositive ? (
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              )}
+              {isPositive ? '+' : ''}{valuesToDisplay.change.toFixed(2)}%
+            </span>
           </div>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex items-center gap-2 p-1 bg-gray-100/50 dark:bg-gray-700/50 rounded-lg backdrop-blur-sm">
           {timeRangeOptions.map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-3 py-1 rounded ${
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 timeRange === range 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  ? 'bg-blue-500 text-white shadow-md transform scale-105' 
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
               }`}
             >
               {range}
@@ -197,29 +152,62 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
           ))}
         </div>
       </div>
-      <div className="relative">
-        <Line 
-          options={options} 
-          data={chartData}
-          plugins={[{
-            id: 'crosshair',
-            afterDraw: (chart: any) => {
-              if (chart.tooltip?._active?.length) {
-                let x = chart.tooltip._active[0].element.x;
-                let yAxis = chart.scales.y;
-                let ctx = chart.ctx;
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(x, yAxis.top);
-                ctx.lineTo(x, yAxis.bottom);
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.stroke();
-                ctx.restore();
-              }
-            }
-          }]}
-        />
+      <div className="h-[400px] w-full transition-all duration-300">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={currentData}
+            onMouseLeave={() => {
+              setDisplayValue(null);
+              debouncedSetTooltipPosition(null);
+              debouncedSetTooltipPosition.flush();
+            }}
+            margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={gradientColor} stopOpacity={0.3}/>
+                <stop offset="95%" stopColor={gradientColor} stopOpacity={0.05}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickFormatter={formatDate}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: '#6B7280' }}
+              minTickGap={30}
+              dy={10}
+            />
+            <YAxis
+              tickFormatter={formatPrice}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: '#6B7280' }}
+              domain={['auto', 'auto']}
+              dx={-10}
+            />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ 
+                stroke: '#6B7280', 
+                strokeWidth: 1, 
+                strokeDasharray: '3 3'
+              }}
+              position={{ x: 0, y: 0 }}
+              isAnimationActive={false}
+            />
+            <Area
+              type="monotone"
+              dataKey="price"
+              stroke={gradientColor}
+              fill="url(#colorGradient)"
+              strokeWidth={2.5}
+              animationDuration={550}
+              animationEasing="ease-in-out"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
