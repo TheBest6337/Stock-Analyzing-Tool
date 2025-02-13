@@ -4,6 +4,7 @@ import { StockData } from '../types';
 import ClipLoader from 'react-spinners/ClipLoader';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import debounce from 'lodash/debounce';
 
 interface Props {
   onStockSelect: (stock: StockData | null) => void;
