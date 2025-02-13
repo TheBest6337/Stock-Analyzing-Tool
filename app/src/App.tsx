@@ -7,13 +7,19 @@ import StockGraph from './components/StockGraph';
 import StockNews from './components/StockNews';
 import { StockData } from './types';
 import { Sun, Moon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true); // Set dark mode as default
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
   };
 
   return (
@@ -42,14 +48,25 @@ function App() {
       />
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-12 relative">
-          <h1 className="text-4xl font-bold mb-2">Stock Analyzer</h1>
-          <p>Comprehensive stock evaluation and recommendations</p>
-          <button
-            onClick={toggleDarkMode}
-            className="absolute top-4 right-4 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
-          >
-            {isDarkMode ? <Sun /> : <Moon />}
-          </button>
+          <h1 className="text-4xl font-bold mb-2">{t('Stock Analyzer')}</h1>
+          <p>{t('Comprehensive stock evaluation and recommendations')}</p>
+          <div className="absolute top-4 right-4 flex items-center space-x-2">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+            >
+              {isDarkMode ? <Sun /> : <Moon />}
+            </button>
+            <select
+              onChange={(e) => changeLanguage(e.target.value)}
+              className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+            >
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+              <option value="de">DE</option>
+              <option value="fr">FR</option>
+            </select>
+          </div>
         </header>
 
         <StockSearch onStockSelect={setSelectedStock} />

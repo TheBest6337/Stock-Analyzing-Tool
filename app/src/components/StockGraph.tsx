@@ -10,12 +10,14 @@ import {
   CartesianGrid
 } from 'recharts';
 import debounce from 'lodash/debounce';
+import { useTranslation } from 'react-i18next';
 
 interface StockGraphProps {
   stock: StockData;
 }
 
 const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
+  const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState<TimeRange>('1M');
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number, y: number } | null>(null);
   const [displayValue, setDisplayValue] = useState<{ price: number; change: number } | null>(null);
@@ -23,7 +25,7 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
   if (!stock.historicalData?.length) {
     return (
       <div className="backdrop-blur-xl bg-white/50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl text-center text-gray-600 dark:text-gray-300">
-        No historical data available
+        {t('No historical data available')}
       </div>
     );
   }
@@ -147,7 +149,7 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
                   : 'hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
               }`}
             >
-              {range}
+              {t(range)}
             </button>
           ))}
         </div>

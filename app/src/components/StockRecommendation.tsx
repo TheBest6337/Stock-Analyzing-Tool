@@ -3,12 +3,14 @@ import { StockData } from '../types';
 import { useState, useEffect } from 'react';
 import { getPeerMetrics } from '../services/stockApi';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   stock: StockData;
 }
 
 export default function StockRecommendation({ stock }: Props) {
+  const { t } = useTranslation();
   const [score, setScore] = useState<number | null>(null);
   const [scoreBreakdown, setScoreBreakdown] = useState<{ [key: string]: number }>({});
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +85,7 @@ export default function StockRecommendation({ stock }: Props) {
   };
 
   const calculateScore = async (): Promise<number> => {
-    const loadingToast = toast.loading('Calculating recommendation score...');
+    const loadingToast = toast.loading(t('Calculating recommendation score...'));
     try {
       const breakdown: { [key: string]: number } = {};
       let totalScore = 0;
@@ -92,7 +94,7 @@ export default function StockRecommendation({ stock }: Props) {
       const peerMetrics = await fetchPeerMetrics(stock.symbol);
 
       if (!peerMetrics || peerMetrics.length === 0) {
-        toast.error('No peer metrics available', { id: loadingToast });
+        toast.error(t('No peer metrics available'), { id: loadingToast });
         return totalScore;
       }
 
@@ -180,10 +182,10 @@ export default function StockRecommendation({ stock }: Props) {
       totalScore += technicalScore;
 
       setScoreBreakdown(breakdown);
-      toast.success('Score calculated successfully', { id: loadingToast });
+      toast.success(t('Score calculated successfully'), { id: loadingToast });
       return Math.round(totalScore);
     } catch (err: any) {
-      toast.error('Failed to calculate recommendation score', { id: loadingToast });
+      toast.error(t('Failed to calculate recommendation score'), { id: loadingToast });
       return 0;
     }
   };
@@ -206,11 +208,11 @@ export default function StockRecommendation({ stock }: Props) {
   };
 
   const getRecommendationText = () => {
-    if (score === null) return 'Calculating...';
-    if (score >= 80) return 'Strong Buy';
-    if (score >= 60) return 'Buy';
-    if (score >= 40) return 'Hold';
-    return 'Not Recommended';
+    if (score === null) return t('Calculating...');
+    if (score >= 80) return t('Strong Buy');
+    if (score >= 60) return t('Buy');
+    if (score >= 40) return t('Hold');
+    return t('Not Recommended');
   };
 
   const getDetailedRecommendation = () => {
@@ -218,19 +220,19 @@ export default function StockRecommendation({ stock }: Props) {
     
     const recommendations = [];
     if (scoreBreakdown.valuation < 15) {
-      recommendations.push('Stock may be overvalued compared to its fundamentals.');
+      recommendations.push(t('Stock may be overvalued compared to its fundamentals.'));
     }
     if (scoreBreakdown.health < 13) {
-      recommendations.push('Company shows some financial health concerns.');
+      recommendations.push(t('Company shows some financial health concerns.'));
     }
     if (scoreBreakdown.volume < 8) {
-      recommendations.push('Low trading volume indicates potential liquidity risks.');
+      recommendations.push(t('Low trading volume indicates potential liquidity risks.'));
     }
     if (scoreBreakdown.peerComparison < 8) {
-      recommendations.push('Underperforming compared to industry peers.');
+      recommendations.push(t('Underperforming compared to industry peers.'));
     }
     if (scoreBreakdown.technical < 8) {
-      recommendations.push('Technical indicators suggest cautious approach.');
+      recommendations.push(t('Technical indicators suggest cautious approach.'));
     }
     
     return recommendations.join(' ');
@@ -239,7 +241,7 @@ export default function StockRecommendation({ stock }: Props) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
       <div className="border-b dark:border-gray-700 pb-4 mb-6">
-        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Stock Analysis</div>
+        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('Stock Analysis')}</div>
         <div className="text-3xl font-bold text-gray-900 dark:text-white">{stock.symbol}</div>
         <div className="text-md text-gray-600 dark:text-gray-400">{stock.name}</div>
       </div>
@@ -247,37 +249,37 @@ export default function StockRecommendation({ stock }: Props) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <AlertCircle className="text-blue-600 dark:text-blue-400 mr-2" />
-          <span className="text-lg font-medium">Overall Score</span>
+          <span className="text-lg font-medium">{t('Overall Score')}</span>
         </div>
         <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-          {score !== null ? `${score}/100` : 'Calculating...'}
+          {score !== null ? `${score}/100` : t('Calculating...')}
         </div>
       </div>
 
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg">
-          <p className="font-medium">⚠️ Error: {error}</p>
+          <p className="font-medium">⚠️ {t('Error')}: {error}</p>
           <p className="text-sm mt-1">
-            Unable to calculate score due to missing data. Please try again later.
+            {t('Unable to calculate score due to missing data. Please try again later.')}
           </p>
         </div>
       )}
 
       <div className={`rounded-lg p-3 mb-4 ${getRecommendationClass()}`}>
-        <h3 className="text-base font-semibold mb-1">Recommendation: {getRecommendationText()}</h3>
+        <h3 className="text-base font-semibold mb-1">{t('Recommendation')}: {getRecommendationText()}</h3>
         <p className="text-sm">
           {getDetailedRecommendation() || 
-          'Analysis based on comprehensive evaluation of fundamentals, technical indicators, and peer comparison.'}
+          t('Analysis based on comprehensive evaluation of fundamentals, technical indicators, and peer comparison.')}
         </p>
       </div>
 
       {scoreBreakdown && (
         <div className="mt-2">
-          <h3 className="text-base font-medium mb-2">Score Breakdown</h3>
+          <h3 className="text-base font-medium mb-2">{t('Score Breakdown')}</h3>
           <div className="grid grid-cols-2 gap-1.5">
             <div className="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 rounded">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Valuation</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('Valuation')}</span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-500 tabular-nums">{scoreBreakdown.valuation}/30</span>
               </div>
               <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -287,7 +289,7 @@ export default function StockRecommendation({ stock }: Props) {
 
             <div className="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 rounded">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Health</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('Health')}</span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-500 tabular-nums">{scoreBreakdown.health}/25</span>
               </div>
               <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -297,7 +299,7 @@ export default function StockRecommendation({ stock }: Props) {
 
             <div className="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 rounded">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Activity</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('Activity')}</span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-500 tabular-nums">{scoreBreakdown.volume}/15</span>
               </div>
               <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -307,7 +309,7 @@ export default function StockRecommendation({ stock }: Props) {
 
             <div className="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 rounded">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Peers</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('Peers')}</span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-500 tabular-nums">{scoreBreakdown.peerComparison}/15</span>
               </div>
               <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -317,7 +319,7 @@ export default function StockRecommendation({ stock }: Props) {
 
             <div className="px-2 py-1.5 bg-gray-50 dark:bg-gray-900 rounded col-span-2">
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Technical</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('Technical')}</span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-500 tabular-nums">{scoreBreakdown.technical}/15</span>
               </div>
               <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -330,10 +332,9 @@ export default function StockRecommendation({ stock }: Props) {
 
       {stock.metrics.pe < 0 && (
         <div className="mt-4 p-3 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 rounded-lg">
-          <p className="font-medium">⚠️ Warning: Negative P/E Ratio</p>
+          <p className="font-medium">⚠️ {t('Warning: Negative P/E Ratio')}</p>
           <p className="text-sm mt-1">
-            A negative P/E ratio indicates the company is currently operating at a loss. 
-            This could suggest higher investment risk or a company in transition.
+            {t('A negative P/E ratio indicates the company is currently operating at a loss. This could suggest higher investment risk or a company in transition.')}
           </p>
         </div>
       )}

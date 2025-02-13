@@ -1,60 +1,63 @@
 import React from 'react';
 import { TrendingUp, DollarSign, BarChart3 } from 'lucide-react';
 import { StockData } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   stock: StockData;
 }
 
 export default function StockMetrics({ stock }: Props) {
+  const { t } = useTranslation();
+
   const getMetricEvaluation = (metric: string, value: number): { status: string; color: string } => {
     switch (metric) {
       case 'pe':
         return value < 0 ? 
-          { status: 'Negative', color: 'text-orange-600' } : 
+          { status: t('Negative'), color: 'text-orange-600' } : 
           value < 15 ? 
-            { status: 'Undervalued', color: 'text-green-600' } : 
+            { status: t('Undervalued'), color: 'text-green-600' } : 
             value > 30 ? 
-              { status: 'Overvalued', color: 'text-red-600' } : 
-              { status: 'Fair Value', color: 'text-yellow-600' };
+              { status: t('Overvalued'), color: 'text-red-600' } : 
+              { status: t('Fair Value'), color: 'text-yellow-600' };
       case 'ps':
         return value < 2 ? 
-          { status: 'Undervalued', color: 'text-green-600' } : 
+          { status: t('Undervalued'), color: 'text-green-600' } : 
           value > 5 ? 
-            { status: 'Overvalued', color: 'text-red-600' } : 
-            { status: 'Fair Value', color: 'text-yellow-600' };
+            { status: t('Overvalued'), color: 'text-red-600' } : 
+            { status: t('Fair Value'), color: 'text-yellow-600' };
       case 'volume':
         return value > 50000000 ? 
-          { status: 'High Activity', color: 'text-green-600' } : 
+          { status: t('High Activity'), color: 'text-green-600' } : 
           value > 20000000 ? 
-            { status: 'Moderate Activity', color: 'text-blue-600' } : 
+            { status: t('Moderate Activity'), color: 'text-blue-600' } : 
             value > 5000000 ?
-              { status: 'Low Activity', color: 'text-yellow-600' } :
-              { status: 'Very Low Activity', color: 'text-red-600' };
+              { status: t('Low Activity'), color: 'text-yellow-600' } :
+              { status: t('Very Low Activity'), color: 'text-red-600' };
       default:
-        return { status: 'Neutral', color: 'text-gray-600' };
+        return { status: t('Neutral'), color: 'text-gray-600' };
     }
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-semibold mb-6">Key Metrics Analysis</h2>
+      <h2 className="text-2xl font-semibold mb-6">{t('Key Metrics Analysis')}</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <MetricCard
-          title="P/E Ratio"
+          title={t('P/E Ratio')}
           value={stock.metrics.pe}
           icon={<TrendingUp />}
           evaluation={getMetricEvaluation('pe', stock.metrics.pe)}
         />
         <MetricCard
-          title="P/S Ratio"
+          title={t('P/S Ratio')}
           value={stock.metrics.ps}
           icon={<DollarSign />}
           evaluation={getMetricEvaluation('ps', stock.metrics.ps)}
         />
         <MetricCard
-          title="Trading Volume"
+          title={t('Trading Volume')}
           value={`${(stock.metrics.volume / 1000000).toFixed(1)}M`}
           icon={<BarChart3 />}
           evaluation={getMetricEvaluation('volume', stock.metrics.volume)}

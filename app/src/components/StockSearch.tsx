@@ -3,12 +3,14 @@ import { getStockData, searchCompanies, getHistoricalData } from '../services/st
 import { StockData } from '../types';
 import ClipLoader from 'react-spinners/ClipLoader';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   onStockSelect: (stock: StockData | null) => void;
 }
 
 export default function StockSearch({ onStockSelect }: Props) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
   const [loading, setLoading] = useState(false);
@@ -17,7 +19,7 @@ export default function StockSearch({ onStockSelect }: Props) {
 
   const handleSearch = async () => {
     if (!query) {
-      toast.error('Please enter a search query');
+      toast.error(t('Please enter a search query'));
       return;
     }
     
@@ -25,11 +27,11 @@ export default function StockSearch({ onStockSelect }: Props) {
     try {
       const results = await searchCompanies(query);
       if (results.length === 0) {
-        toast.error('No companies found matching your search');
+        toast.error(t('No companies found matching your search'));
       }
       setSearchResults(results);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to search companies');
+      toast.error(err.message || t('Failed to search companies'));
       setSearchResults([]);
     }
     setLoading(false);
@@ -53,7 +55,7 @@ export default function StockSearch({ onStockSelect }: Props) {
     }, 1000);
 
     setLoading(true);
-    const loadingToast = toast.loading(`Loading data for ${symbol}...`);
+    const loadingToast = toast.loading(t(`Loading data for ${symbol}...`));
     try {
       const [stockData, historicalData] = await Promise.all([
         getStockData(symbol),
@@ -61,7 +63,7 @@ export default function StockSearch({ onStockSelect }: Props) {
       ]);
       
       if (!stockData) {
-        throw new Error('Failed to fetch stock data');
+        throw new Error(t('Failed to fetch stock data'));
       }
 
       onStockSelect({
@@ -73,11 +75,11 @@ export default function StockSearch({ onStockSelect }: Props) {
       });
       setSearchResults([]);
       setQuery('');
-      toast.success(`Successfully loaded ${symbol} data`, {
+      toast.success(t(`Successfully loaded ${symbol} data`), {
         id: loadingToast
       });
     } catch (err: any) {
-      toast.error(err.message || `Failed to load ${symbol} data`, {
+      toast.error(err.message || t(`Failed to load ${symbol} data`), {
         id: loadingToast
       });
       onStockSelect(null);
@@ -92,7 +94,7 @@ export default function StockSearch({ onStockSelect }: Props) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by company name or symbol..."
+          placeholder={t('Search by company name or symbol...')}
           className="flex-1 p-2 border rounded bg-white dark:bg-gray-800 text-black dark:text-white"
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -105,7 +107,7 @@ export default function StockSearch({ onStockSelect }: Props) {
           disabled={loading}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
         >
-          {loading ? 'Searching...' : 'Search'}
+          {loading ? t('Searching...') : t('Search')}
         </button>
       </div>
 

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { getStockNews } from '../services/stockApi';
 import { NewsArticle } from '../types';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface StockNewsProps {
   symbol: string;
 }
 
 const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
+  const { t } = useTranslation();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -15,13 +17,13 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
 
   useEffect(() => {
     const fetchNews = async () => {
-      const loadingToast = toast.loading('Loading news...');
+      const loadingToast = toast.loading(t('Loading news...'));
       try {
         const newsData = await getStockNews(symbol);
         setNews(newsData);
-        toast.success('News loaded successfully', { id: loadingToast });
+        toast.success(t('News loaded successfully'), { id: loadingToast });
       } catch (err: any) {
-        toast.error(err.message || 'Failed to load news', { id: loadingToast });
+        toast.error(err.message || t('Failed to load news'), { id: loadingToast });
         setError(err.message);
       } finally {
         setLoading(false);
@@ -29,21 +31,21 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
     };
 
     fetchNews();
-  }, [symbol]);
+  }, [symbol, t]);
 
   if (loading) {
-    return <div>Loading news...</div>;
+    return <div>{t('Loading news...')}</div>;
   }
 
   if (error) {
-    return <div>Error fetching news: {error}</div>;
+    return <div>{t('Error fetching news')}: {error}</div>;
   }
 
   const displayedNews = showAll ? news : news.slice(0, 4);
 
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4">Latest News</h2>
+      <h2 className="text-2xl font-semibold mb-4">{t('Latest News')}</h2>
       <ul className="space-y-4">
         {displayedNews.map((article, index) => (
           <li key={index} className="border-b pb-4">
@@ -60,7 +62,7 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
           onClick={() => setShowAll(!showAll)}
           className="mt-4 text-blue-500 hover:underline"
         >
-          {showAll ? 'Show less' : 'See more'}
+          {showAll ? t('Show less') : t('See more')}
         </button>
       )}
     </div>
