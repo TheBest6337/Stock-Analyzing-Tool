@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Toaster } from 'react-hot-toast';
 import StockSearch from './components/StockSearch';
 import StockMetrics from './components/StockMetrics';
@@ -8,19 +8,22 @@ import StockNews from './components/StockNews';
 import { StockData } from './types';
 import { Sun, Moon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import i18n from './i18n';
 
 function App() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(true); // Set dark mode as default
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-  };
+  const changeLanguage = useCallback((lng: string) => {
+    if (i18n.isInitialized) {
+      i18n.changeLanguage(lng);
+    }
+  }, []);
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark' : 'light'}`}>
@@ -58,6 +61,7 @@ function App() {
               {isDarkMode ? <Sun /> : <Moon />}
             </button>
             <select
+              value={i18n.language}
               onChange={(e) => changeLanguage(e.target.value)}
               className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
             >

@@ -1,6 +1,6 @@
 import { AlertCircle } from 'lucide-react';
 import { StockData } from '../types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getPeerMetrics } from '../services/stockApi';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,19 @@ export default function StockRecommendation({ stock }: Props) {
   const [score, setScore] = useState<number | null>(null);
   const [scoreBreakdown, setScoreBreakdown] = useState<{ [key: string]: number }>({});
   const [error, setError] = useState<string | null>(null);
+
+  // Memoize the key stock metrics to prevent unnecessary recalculations
+  const stockKey = useMemo(() => ({
+    symbol: stock.symbol,
+    metrics: {
+      pe: stock.metrics.pe,
+      ps: stock.metrics.ps,
+      volume: stock.metrics.volume,
+      currentRatio: stock.metrics.currentRatio,
+      debtToEquity: stock.metrics.debtToEquity
+    },
+    historicalData: stock.historicalData.map(d => ({ date: d.date, price: d.price }))
+  }), [stock.symbol, stock.metrics, stock.historicalData]);
 
   const fetchPeerMetrics = async (symbol: string) => {
     return await getPeerMetrics(symbol);
@@ -191,13 +204,28 @@ export default function StockRecommendation({ stock }: Props) {
   };
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchScore = async () => {
-      const calculatedScore = await calculateScore();
-      setScore(calculatedScore);
+      try {
+        const calculatedScore = await calculateScore();
+        if (isMounted) {
+          setScore(calculatedScore);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Failed to calculate score');
+        }
+      }
     };
 
+    // Only calculate score when stockKey changes
     fetchScore();
-  }, [stock]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [stockKey]); // Dependencies are now properly memoized
 
   const getRecommendationClass = () => {
     if (score === null) return '';

@@ -31,7 +31,7 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
     };
 
     fetchNews();
-  }, [symbol, t]);
+  }, [symbol]);
 
   if (loading) {
     return <div>{t('Loading news...')}</div>;
