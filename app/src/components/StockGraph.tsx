@@ -120,19 +120,19 @@ const StockGraph: React.FC<StockGraphProps> = ({ stock }) => {
             ${valuesToDisplay.price.toFixed(2)}
           </div>
           <div className={`text-lg font-medium transition-colors duration-200 ${
-            isPositive ? 'text-green-500' : 'text-red-500'
+            valuesToDisplay.change >= 0 ? 'text-green-500' : 'text-red-500'
           }`}>
             <span className="inline-flex items-center">
-              {isPositive ? (
+              {valuesToDisplay.change >= 0 ? (
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
+                </svg> 
               ) : (
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               )}
-              {isPositive ? '+' : ''}{valuesToDisplay.change.toFixed(2)}%
+              {valuesToDisplay.change >= 0 ? '+' : ''}{valuesToDisplay.change.toFixed(2)}%
             </span>
           </div>
         </div>
